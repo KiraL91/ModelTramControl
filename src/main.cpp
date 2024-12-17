@@ -26,4 +26,5 @@ void setup()
 void loop()
 {
   sm->Run();
+  delay(10);
 }

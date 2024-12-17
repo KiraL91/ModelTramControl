@@ -11,3 +11,6 @@
 
 // Pin de la interrupción
 #define INTERRUP_PIN 5
+
+// Tiempo en parada
+#define STOP_TIME_MILLISECONDS 5000
