@@ -1,16 +1,17 @@
 #pragma once
 
-// Configuración del motor
-#define IN1 7
-#define IN2 8
-#define EN 9
+// Motor pinout configuration
+#define EN 5
+#define IN1 6
+#define IN2 7
 
-// Pines de los sensores
+// Interuptions
 #define SENSOR_1_PIN 2
 #define SENSOR_2_PIN 3
 
-// Pin de la interrupción
-#define INTERRUP_PIN 5
-
-// Tiempo en parada
+// Stop time
 #define STOP_TIME_MILLISECONDS 5000
+
+// Motor speed limit
+#define MAX_MOTOR_SPEED 255
+#define ZERO_MOTOR_SPEED 0

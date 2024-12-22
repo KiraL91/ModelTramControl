@@ -12,10 +12,15 @@ void setup()
 {
   Serial.begin(9600);
 
-  pinMode(SENSOR_1_PIN, INPUT);
-  pinMode(SENSOR_2_PIN, INPUT);
-  pinMode(INTERRUP_PIN, INPUT_PULLUP);
-  attachInterrupt(digitalPinToInterrupt(INTERRUP_PIN), Model::StateMachine::Callback, FALLING);
+  pinMode(PD2, INPUT_PULLUP);
+  pinMode(PD3, INPUT_PULLUP);
+
+  pinMode(EN, OUTPUT);
+  pinMode(IN1, OUTPUT);
+  pinMode(IN2, OUTPUT);
+
+  attachInterrupt(digitalPinToInterrupt(PD2), Model::StateMachine::Callback, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(PD3), Model::StateMachine::Callback, CHANGE);
 
   motor = new L298N(EN, IN1, IN2);
   sm = new Model::StateMachine();

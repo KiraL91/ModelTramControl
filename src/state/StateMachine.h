@@ -14,7 +14,6 @@ namespace Model
 
         static volatile bool isFirstSensorPressed;
         static volatile bool isLastSensorPressed;
-
         unsigned long _stateStartTime = 0;
 
     public:
@@ -25,5 +24,14 @@ namespace Model
         State GetState();
 
         static void Callback();
+
+    private:
+        void PrintSensorStatus();
+        void ResetTimer();
+        bool IsWaitingAtStop();
+
+        void MotorForward();
+        void MotorBackward();
+        void MotorStop();
     };
 }

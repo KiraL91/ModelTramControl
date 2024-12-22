@@ -10,6 +10,7 @@ namespace Model
     StateMachine::StateMachine()
     {
         _state = State::UNDEFINED;
+        Serial.println("State: UNDEFINED");
     }
 
     void StateMachine::Setup(L298N *motor)
@@ -19,71 +20,72 @@ namespace Model
 
     void StateMachine::Run()
     {
+        // PrintSensorStatus();
+
         // Verify if in error
         if (isFirstSensorPressed && isLastSensorPressed)
         {
             _state = State::ERROR;
-            _motor->stop();
+            MotorStop();
             return;
         }
 
         switch (_state)
         {
         case State::UNDEFINED:
-            Serial.println("UNDEFINED");
             if (isFirstSensorPressed)
             {
                 _state = State::FORDWARD;
-                _motor->forward();
+                MotorForward();
             }
             if (isLastSensorPressed)
             {
                 _state = State::BACKWARD;
-                _motor->forward();
+                MotorBackward();
             }
             break;
         case State::FORDWARD:
-            Serial.println("FORWARD");
-            if (isLastSensorPressed)
+            if (!isLastSensorPressed)
             {
-                _state = State::LAST_STOP;
-                _motor->stop();
-                _stateStartTime = millis(); // Reiniciar temporizador
+                MotorForward();
             }
             else
             {
-                _motor->forward();
+                Serial.println("State: LAST_STOP");
+                _state = State::LAST_STOP;
+                MotorStop();
+                ResetTimer();
             }
             break;
         case State::BACKWARD:
-            Serial.println("BACKWARD");
-            if (isFirstSensorPressed)
+            if (!isFirstSensorPressed)
             {
-                _state = State::FIRST_STOP;
-                _motor->stop();
-                _stateStartTime = millis(); // Reiniciar temporizador
+                MotorBackward();
             }
             else
             {
-                _motor->backward();
+                Serial.println("State: FIRST_STOP");
+                _state = State::FIRST_STOP;
+                MotorStop();
+                ResetTimer();
             }
             break;
         case State::FIRST_STOP:
-            Serial.println("FIRST_STOP");
-            if (millis() - _stateStartTime >= STOP_TIME_MILLISECONDS)
+            if (!IsWaitingAtStop())
             {
                 _state = State::FORDWARD;
-                _motor->forward();
+                MotorForward();
             }
             break;
+
         case State::LAST_STOP:
-            Serial.println("LAST_STOP");
-            if (millis() - _stateStartTime >= STOP_TIME_MILLISECONDS)
+            if (!IsWaitingAtStop())
             {
                 _state = State::BACKWARD;
-                _motor->backward();
+                MotorBackward();
             }
             break;
+
         case State::ERROR:
             Serial.println("ERROR");
             if (isFirstSensorPressed && !isLastSensorPressed)
@@ -112,8 +114,45 @@ namespace Model
 
     void StateMachine::Callback()
     {
-        isFirstSensorPressed = PIND & (1 << SENSOR_1_PIN);
-        isLastSensorPressed = PIND & (1 << SENSOR_2_PIN);
+        isFirstSensorPressed = digitalRead(PD2) == LOW;
+        isLastSensorPressed = digitalRead(PD3) == LOW;
     }
 
+    void StateMachine::PrintSensorStatus()
+    {
+        Serial.print(String(isFirstSensorPressed));
+        Serial.print(", ");
+        Serial.println(String(isLastSensorPressed));
+    }
+
+    void StateMachine::MotorForward()
+    {
+        Serial.println("FORDWARD");
+        _motor->setSpeed(MAX_MOTOR_SPEED);
+        _motor->forward();
+    }
+
+    void StateMachine::MotorBackward()
+    {
+        Serial.println("BACKWARD");
+        _motor->setSpeed(MAX_MOTOR_SPEED);
+        _motor->forward();
+    }
+
+    void StateMachine::MotorStop()
+    {
+        Serial.println("STOP");
+        _motor->setSpeed(ZERO_MOTOR_SPEED);
+        _motor->stop();
+    }
+
+    void StateMachine::ResetTimer()
+    {
+        _stateStartTime = millis();
+    }
+
+    bool StateMachine::IsWaitingAtStop()
+    {
+        return millis() - _stateStartTime < STOP_TIME_MILLISECONDS;
+    }
 }
