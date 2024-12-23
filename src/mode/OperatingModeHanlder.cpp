@@ -1,6 +1,7 @@
 #include "./OperatingModeHandler.h"
 #include "../state/StateMachine.h"
 #include "../manual/ManualModeHandler.h"
+#include "../config.h"
 
 namespace Model::Mode
 {
@@ -14,22 +15,28 @@ namespace Model::Mode
 
     void OperatingModeHandler::SetMode(OperatingMode mode)
     {
-        if (_mode != mode)
+        if (_mode != mode || _mode == OperatingMode::Undefined)
         {
             _mode = mode;
-
-            if (_mode == OperatingMode::Auto)
+            switch (_mode)
             {
-                Serial.println("MODE: AUTO");
+            case OperatingMode::Auto:
                 _stateMachine->Enable();
                 _manualModeHandler->Disable();
-            }
-            else
-            {
-                Serial.println("MODE: MANUAL");
+                break;
+            case OperatingMode::Manual:
                 _stateMachine->Disable();
                 _manualModeHandler->Enable();
+                break;
+            case OperatingMode::Undefined:
+                _stateMachine->Disable();
+                _manualModeHandler->Disable();
+                break;
+            default:
+                break;
             }
+
+            LogInfo();
         }
     }
 
@@ -38,5 +45,27 @@ namespace Model::Mode
         _mode == OperatingMode::Auto
             ? _stateMachine->Run()
             : _manualModeHandler->Run();
+    }
+
+    void OperatingModeHandler::LogInfo()
+    {
+        if (DEBUG_MODE)
+        {
+            Serial.print("OperatingMode: ");
+            switch (_mode)
+            {
+            case OperatingMode::Auto:
+                Serial.println("Auto");
+                break;
+            case OperatingMode::Manual:
+                Serial.println("Manual");
+                break;
+            case OperatingMode::Undefined:
+                Serial.println("Undefined");
+                break;
+            default:
+                break;
+            }
+        }
     }
 }

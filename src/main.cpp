@@ -52,5 +52,6 @@ void loop()
       ? omh->SetMode(Model::Mode::OperatingMode::Auto)
       : omh->SetMode(Model::Mode::OperatingMode::Manual);
   omh->Run();
+
   delay(10);
 }

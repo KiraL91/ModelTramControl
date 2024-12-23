@@ -15,5 +15,8 @@ namespace Model::Manual
         void Run();
         void Enable();
         void Disable();
+
+    private:
+        void LogInfo(int potRead, int speed, int direction);
     };
 }

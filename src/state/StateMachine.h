@@ -34,5 +34,7 @@ namespace Model::State
         void MotorForward();
         void MotorBackward();
         void MotorStop();
+
+        void LogInfo();
     };
 }

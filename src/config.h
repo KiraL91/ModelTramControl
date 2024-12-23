@@ -1,5 +1,7 @@
 #pragma once
 
+#define DEBUG_MODE true
+
 // Motor pinout configuration
 #define EN PD5
 #define IN1 PD6
@@ -17,6 +19,9 @@
 
 // Manual mode pot
 #define POT A0
+#define MIN_POT_VALUE 0
+#define MAX_POT_VALUE 1024
+#define ZERO_POT_VALUE 511
 
 // Motor speed limit
 #define MAX_MOTOR_SPEED 255

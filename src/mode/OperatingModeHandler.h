@@ -12,7 +12,7 @@ namespace Model::Mode
         Model::State::StateMachine *_stateMachine = nullptr;
         Model::Manual::ManualModeHandler *_manualModeHandler = nullptr;
 
-        OperatingMode _mode = OperatingMode::Auto;
+        OperatingMode _mode = OperatingMode::Undefined;
 
     public:
         OperatingModeHandler(
@@ -21,5 +21,8 @@ namespace Model::Mode
 
         void SetMode(OperatingMode mode);
         void Run();
+
+    private:
+        void LogInfo();
     };
 }

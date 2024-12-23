@@ -10,7 +10,6 @@ namespace Model::State
     StateMachine::StateMachine()
     {
         _state = State::Undefined;
-        Serial.println("State: UNDEFINED");
     }
 
     void StateMachine::Setup(L298N *motor)
@@ -36,7 +35,8 @@ namespace Model::State
             return;
         }
 
-        // Verify if in error
+        LogInfo();
+
         if (isFirstSensorPressed && isLastSensorPressed)
         {
             _state = State::Error;
@@ -65,7 +65,6 @@ namespace Model::State
             }
             else
             {
-                Serial.println("State: LAST_STOP");
                 _state = State::LastStop;
                 MotorStop();
                 ResetTimer();
@@ -78,7 +77,6 @@ namespace Model::State
             }
             else
             {
-                Serial.println("State: FIRST_STOP");
                 _state = State::FirstStop;
                 MotorStop();
                 ResetTimer();
@@ -101,7 +99,6 @@ namespace Model::State
             break;
 
         case State::Error:
-            Serial.println("ERROR");
             if (isFirstSensorPressed && !isLastSensorPressed)
             {
                 _state = State::Fordward;
@@ -134,21 +131,18 @@ namespace Model::State
 
     void StateMachine::MotorForward()
     {
-        Serial.println("FORDWARD");
         _motor->setSpeed(MAX_MOTOR_SPEED);
         _motor->forward();
     }
 
     void StateMachine::MotorBackward()
     {
-        Serial.println("BACKWARD");
         _motor->setSpeed(MAX_MOTOR_SPEED);
-        _motor->forward();
+        _motor->backward();
     }
 
     void StateMachine::MotorStop()
     {
-        Serial.println("STOP");
         _motor->setSpeed(ZERO_MOTOR_SPEED);
         _motor->stop();
     }
@@ -161,5 +155,35 @@ namespace Model::State
     bool StateMachine::IsWaitingAtStop()
     {
         return millis() - _stateStartTime < STOP_TIME_MILLISECONDS;
+    }
+
+    void StateMachine::LogInfo()
+    {
+        if (DEBUG_MODE)
+        {
+            switch (_state)
+            {
+            case State::Error:
+                Serial.println("Error");
+                break;
+            case State::Fordward:
+                Serial.println("Fordward");
+                break;
+            case State::Backward:
+                Serial.println("Backward");
+                break;
+            case State::FirstStop:
+                Serial.println("FirstStop");
+                break;
+            case State::LastStop:
+                Serial.println("LastStop");
+                break;
+            case State::Undefined:
+                Serial.println("Undefined");
+                break;
+            default:
+                break;
+            }
+        }
     }
 }
