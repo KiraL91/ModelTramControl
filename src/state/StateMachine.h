@@ -1,10 +1,9 @@
 #pragma once
 
 #include <L298N.h>
-
 #include "./States.h"
 
-namespace Model
+namespace Model::State
 {
     class StateMachine
     {
@@ -15,6 +14,7 @@ namespace Model
         static volatile bool isFirstSensorPressed;
         static volatile bool isLastSensorPressed;
         unsigned long _stateStartTime = 0;
+        bool _enabled = false;
 
     public:
         StateMachine();
@@ -22,11 +22,12 @@ namespace Model
         void Setup(L298N *motor);
         void Run();
         State GetState();
+        void Enable();
+        void Disable();
 
         static void Callback();
 
     private:
-        void PrintSensorStatus();
         void ResetTimer();
         bool IsWaitingAtStop();
 

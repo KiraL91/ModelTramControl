@@ -2,14 +2,14 @@
 #include "./States.h"
 #include "../config.h"
 
-namespace Model
+namespace Model::State
 {
     volatile bool StateMachine::isFirstSensorPressed = false;
     volatile bool StateMachine::isLastSensorPressed = false;
 
     StateMachine::StateMachine()
     {
-        _state = State::UNDEFINED;
+        _state = State::Undefined;
         Serial.println("State: UNDEFINED");
     }
 
@@ -18,33 +18,47 @@ namespace Model
         _motor = motor;
     }
 
+    void StateMachine::Enable()
+    {
+        _enabled = true;
+        _state = State::Undefined;
+    }
+    void StateMachine::Disable()
+    {
+        _enabled = false;
+        _state = State::Undefined;
+    }
+
     void StateMachine::Run()
     {
-        // PrintSensorStatus();
+        if (!_enabled)
+        {
+            return;
+        }
 
         // Verify if in error
         if (isFirstSensorPressed && isLastSensorPressed)
         {
-            _state = State::ERROR;
+            _state = State::Error;
             MotorStop();
             return;
         }
 
         switch (_state)
         {
-        case State::UNDEFINED:
+        case State::Undefined:
             if (isFirstSensorPressed)
             {
-                _state = State::FORDWARD;
+                _state = State::Fordward;
                 MotorForward();
             }
             if (isLastSensorPressed)
             {
-                _state = State::BACKWARD;
+                _state = State::Backward;
                 MotorBackward();
             }
             break;
-        case State::FORDWARD:
+        case State::Fordward:
             if (!isLastSensorPressed)
             {
                 MotorForward();
@@ -52,12 +66,12 @@ namespace Model
             else
             {
                 Serial.println("State: LAST_STOP");
-                _state = State::LAST_STOP;
+                _state = State::LastStop;
                 MotorStop();
                 ResetTimer();
             }
             break;
-        case State::BACKWARD:
+        case State::Backward:
             if (!isFirstSensorPressed)
             {
                 MotorBackward();
@@ -65,36 +79,36 @@ namespace Model
             else
             {
                 Serial.println("State: FIRST_STOP");
-                _state = State::FIRST_STOP;
+                _state = State::FirstStop;
                 MotorStop();
                 ResetTimer();
             }
             break;
-        case State::FIRST_STOP:
+        case State::FirstStop:
             if (!IsWaitingAtStop())
             {
-                _state = State::FORDWARD;
+                _state = State::Fordward;
                 MotorForward();
             }
             break;
 
-        case State::LAST_STOP:
+        case State::LastStop:
             if (!IsWaitingAtStop())
             {
-                _state = State::BACKWARD;
+                _state = State::Backward;
                 MotorBackward();
             }
             break;
 
-        case State::ERROR:
+        case State::Error:
             Serial.println("ERROR");
             if (isFirstSensorPressed && !isLastSensorPressed)
             {
-                _state = State::FORDWARD;
+                _state = State::Fordward;
             }
             else if (!isFirstSensorPressed && isLastSensorPressed)
             {
-                _state = State::BACKWARD;
+                _state = State::Backward;
             }
             else
             {
@@ -116,13 +130,6 @@ namespace Model
     {
         isFirstSensorPressed = digitalRead(PD2) == LOW;
         isLastSensorPressed = digitalRead(PD3) == LOW;
-    }
-
-    void StateMachine::PrintSensorStatus()
-    {
-        Serial.print(String(isFirstSensorPressed));
-        Serial.print(", ");
-        Serial.println(String(isLastSensorPressed));
     }
 
     void StateMachine::MotorForward()

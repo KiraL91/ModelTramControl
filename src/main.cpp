@@ -4,32 +4,53 @@
 
 #include "./config.h"
 #include "./state/StateMachine.h"
+#include "./mode/OperatingModeHandler.h"
+#include "./manual/ManualModeHandler.h"
 
 L298N *motor;
-Model::StateMachine *sm;
+Model::State::StateMachine *sm;
+Model::Mode::OperatingModeHandler *omh;
+Model::Manual::ManualModeHandler *mmh;
 
 void setup()
 {
   Serial.begin(9600);
 
-  pinMode(PD2, INPUT_PULLUP);
-  pinMode(PD3, INPUT_PULLUP);
+  // Hall sensors
+  pinMode(HALL1, INPUT_PULLUP);
+  pinMode(HALL2, INPUT_PULLUP);
 
+  // L298
   pinMode(EN, OUTPUT);
   pinMode(IN1, OUTPUT);
   pinMode(IN2, OUTPUT);
 
-  attachInterrupt(digitalPinToInterrupt(PD2), Model::StateMachine::Callback, CHANGE);
-  attachInterrupt(digitalPinToInterrupt(PD3), Model::StateMachine::Callback, CHANGE);
+  // Pot
+  pinMode(POT, INPUT);
+
+  // Hall sensor interruptions
+  attachInterrupt(digitalPinToInterrupt(HALL1), Model::State::StateMachine::Callback, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(HALL2), Model::State::StateMachine::Callback, CHANGE);
+
+  // Mode sensors
+  pinMode(SWITCH, INPUT_PULLUP);
 
   motor = new L298N(EN, IN1, IN2);
-  sm = new Model::StateMachine();
 
+  sm = new Model::State::StateMachine();
   sm->Setup(motor);
+
+  mmh = new Model::Manual::ManualModeHandler();
+  mmh->Setup(motor);
+
+  omh = new Model::Mode::OperatingModeHandler(sm, mmh);
 }
 
 void loop()
 {
-  sm->Run();
+  digitalRead(SWITCH) == LOW
+      ? omh->SetMode(Model::Mode::OperatingMode::Auto)
+      : omh->SetMode(Model::Mode::OperatingMode::Manual);
+  omh->Run();
   delay(10);
 }

@@ -1,14 +1,14 @@
 #pragma once
 
-namespace Model
+namespace Model::State
 {
     enum class State
     {
-        UNDEFINED,
-        FIRST_STOP,
-        LAST_STOP,
-        FORDWARD,
-        BACKWARD,
-        ERROR
+        Undefined,
+        FirstStop,
+        LastStop,
+        Fordward,
+        Backward,
+        Error
     };
 }
