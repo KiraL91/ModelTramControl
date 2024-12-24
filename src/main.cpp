@@ -26,17 +26,14 @@ void setup()
   // Pot
   pinMode(POT, INPUT);
 
-  // Hall sensor interruptions
-  attachInterrupt(digitalPinToInterrupt(HALL1), Model::State::Dual::StateMachineDual::Callback, CHANGE);
-  attachInterrupt(digitalPinToInterrupt(HALL2), Model::State::Dual::StateMachineDual::Callback, CHANGE);
-
   // Mode sensors
   pinMode(SWITCH, INPUT_PULLUP);
 
   motor = new L298N(EN, IN1, IN2);
-#if STOPS == 2
+#if STOPS == 1
   sm = new Model::State::Single::StateMachineSingle();
-#elif STOPS == 1
+#endif
+#if STOPS == 2
   sm = new Model::State::Dual::StateMachineDual();
 #endif
   sm->Setup(motor);

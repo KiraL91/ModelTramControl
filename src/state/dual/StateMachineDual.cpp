@@ -13,23 +13,13 @@ namespace Model::State::Dual
 
         pinMode(HALL1, INPUT_PULLUP);
         pinMode(HALL2, INPUT_PULLUP);
-    }
 
-    void StateMachineDual::Setup(L298N *motor) const
-    {
-        _motor = motor;
-    }
-
-    void StateMachineDual::Enable() const
-    {
-        _enabled = true;
-        _state = MachineState::Undefined;
-    }
-    
-    void StateMachineDual::Disable() const
-    {
-        _enabled = false;
-        _state = MachineState::Undefined;
+        attachInterrupt(
+            digitalPinToInterrupt(HALL1),
+            Model::State::Dual::StateMachineDual::Callback, CHANGE);
+        attachInterrupt(
+            digitalPinToInterrupt(HALL2),
+            Model::State::Dual::StateMachineDual::Callback, CHANGE);
     }
 
     void StateMachineDual::Run() const
@@ -122,72 +112,9 @@ namespace Model::State::Dual
         }
     }
 
-    MachineState StateMachineDual::GetState() const
-    {
-        return _state;
-    }
-
     void StateMachineDual::Callback()
     {
         isFirstSensorPressed = digitalRead(PD2) == LOW;
         isLastSensorPressed = digitalRead(PD3) == LOW;
-    }
-
-    void StateMachineDual::MotorForward() const
-    {
-        _motor->setSpeed(MAX_MOTOR_SPEED);
-        _motor->forward();
-    }
-
-    void StateMachineDual::MotorBackward() const
-    {
-        _motor->setSpeed(MAX_MOTOR_SPEED);
-        _motor->backward();
-    }
-
-    void StateMachineDual::MotorStop() const
-    {
-        _motor->setSpeed(ZERO_MOTOR_SPEED);
-        _motor->stop();
-    }
-
-    void StateMachineDual::ResetTimer() const
-    {
-        _stateStartTime = millis();
-    }
-
-    bool StateMachineDual::IsWaitingAtStop() const
-    {
-        return millis() - _stateStartTime < STOP_TIME_MILLISECONDS;
-    }
-
-    void StateMachineDual::LogInfo() const
-    {
-        if (DEBUG_MODE)
-        {
-            switch (_state)
-            {
-            case MachineState::Error:
-                Serial.println("Error");
-                break;
-            case MachineState::Fordward:
-                Serial.println("Fordward");
-                break;
-            case MachineState::Backward:
-                Serial.println("Backward");
-                break;
-            case MachineState::FirstStop:
-                Serial.println("FirstStop");
-                break;
-            case MachineState::LastStop:
-                Serial.println("LastStop");
-                break;
-            case MachineState::Undefined:
-                Serial.println("Undefined");
-                break;
-            default:
-                break;
-            }
-        }
     }
 }
