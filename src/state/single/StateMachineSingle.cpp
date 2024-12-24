@@ -65,6 +65,6 @@ namespace Model::State::Single
 
     void StateMachineSingle::Callback()
     {
-        isSensorPressed = digitalRead(PD2) == LOW;
+        isSensorPressed = digitalRead(HALL1) == LOW;
     }
 }

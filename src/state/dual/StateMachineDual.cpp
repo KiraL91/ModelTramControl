@@ -114,7 +114,7 @@ namespace Model::State::Dual
 
     void StateMachineDual::Callback()
     {
-        isFirstSensorPressed = digitalRead(PD2) == LOW;
-        isLastSensorPressed = digitalRead(PD3) == LOW;
+        isFirstSensorPressed = digitalRead(HALL1) == LOW;
+        isLastSensorPressed = digitalRead(HALL2) == LOW;
     }
 }
