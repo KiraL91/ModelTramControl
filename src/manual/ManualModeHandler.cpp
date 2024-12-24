@@ -30,7 +30,7 @@ namespace Model::Manual
                             : map(potRead, ZERO_POT_VALUE + 1, MAX_POT_VALUE, 0, 255);
 
             _motor->setSpeed(speed);
-            potRead <= 511 ? _motor->forward() : _motor->backward();
+            potRead <= ZERO_POT_VALUE ? _motor->forward() : _motor->backward();
 
             LogInfo(potRead, speed, _motor->getDirection());
         }
