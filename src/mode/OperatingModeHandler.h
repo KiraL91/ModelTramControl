@@ -1,7 +1,7 @@
 #pragma once
 
 #include "./OperatingMode.h"
-#include "../state/StateMachine.h"
+#include "../state/IStateMachine.h"
 #include "../manual/ManualModeHandler.h"
 
 namespace Model::Mode
@@ -9,14 +9,14 @@ namespace Model::Mode
     class OperatingModeHandler
     {
     private:
-        Model::State::StateMachine *_stateMachine = nullptr;
+        Model::State::IStateMachine *_stateMachine = nullptr;
         Model::Manual::ManualModeHandler *_manualModeHandler = nullptr;
 
         OperatingMode _mode = OperatingMode::Undefined;
 
     public:
         OperatingModeHandler(
-            Model::State::StateMachine *stateMachine,
+            Model::State::IStateMachine *stateMachine,
             Model::Manual::ManualModeHandler *manualModeHandler);
 
         void SetMode(OperatingMode mode);

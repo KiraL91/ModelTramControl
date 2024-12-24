@@ -1,34 +1,38 @@
-#include "./StateMachine.h"
-#include "./States.h"
-#include "../config.h"
+#include "./StateMachineDual.h"
+#include "../States.h"
+#include "../../config.h"
 
-namespace Model::State
+namespace Model::State::Dual
 {
-    volatile bool StateMachine::isFirstSensorPressed = false;
-    volatile bool StateMachine::isLastSensorPressed = false;
+    volatile bool StateMachineDual::isFirstSensorPressed = false;
+    volatile bool StateMachineDual::isLastSensorPressed = false;
 
-    StateMachine::StateMachine()
+    StateMachineDual::StateMachineDual()
     {
-        _state = State::Undefined;
+        _state = MachineState::Undefined;
+
+        pinMode(HALL1, INPUT_PULLUP);
+        pinMode(HALL2, INPUT_PULLUP);
     }
 
-    void StateMachine::Setup(L298N *motor)
+    void StateMachineDual::Setup(L298N *motor) const
     {
         _motor = motor;
     }
 
-    void StateMachine::Enable()
+    void StateMachineDual::Enable() const
     {
         _enabled = true;
-        _state = State::Undefined;
+        _state = MachineState::Undefined;
     }
-    void StateMachine::Disable()
+    
+    void StateMachineDual::Disable() const
     {
         _enabled = false;
-        _state = State::Undefined;
+        _state = MachineState::Undefined;
     }
 
-    void StateMachine::Run()
+    void StateMachineDual::Run() const
     {
         if (!_enabled)
         {
@@ -39,73 +43,73 @@ namespace Model::State
 
         if (isFirstSensorPressed && isLastSensorPressed)
         {
-            _state = State::Error;
+            _state = MachineState::Error;
             MotorStop();
             return;
         }
 
         switch (_state)
         {
-        case State::Undefined:
+        case MachineState::Undefined:
             if (isFirstSensorPressed)
             {
-                _state = State::Fordward;
+                _state = MachineState::Fordward;
                 MotorForward();
             }
             if (isLastSensorPressed)
             {
-                _state = State::Backward;
+                _state = MachineState::Backward;
                 MotorBackward();
             }
             break;
-        case State::Fordward:
+        case MachineState::Fordward:
             if (!isLastSensorPressed)
             {
                 MotorForward();
             }
             else
             {
-                _state = State::LastStop;
+                _state = MachineState::LastStop;
                 MotorStop();
                 ResetTimer();
             }
             break;
-        case State::Backward:
+        case MachineState::Backward:
             if (!isFirstSensorPressed)
             {
                 MotorBackward();
             }
             else
             {
-                _state = State::FirstStop;
+                _state = MachineState::FirstStop;
                 MotorStop();
                 ResetTimer();
             }
             break;
-        case State::FirstStop:
+        case MachineState::FirstStop:
             if (!IsWaitingAtStop())
             {
-                _state = State::Fordward;
+                _state = MachineState::Fordward;
                 MotorForward();
             }
             break;
 
-        case State::LastStop:
+        case MachineState::LastStop:
             if (!IsWaitingAtStop())
             {
-                _state = State::Backward;
+                _state = MachineState::Backward;
                 MotorBackward();
             }
             break;
 
-        case State::Error:
+        case MachineState::Error:
             if (isFirstSensorPressed && !isLastSensorPressed)
             {
-                _state = State::Fordward;
+                _state = MachineState::Fordward;
             }
             else if (!isFirstSensorPressed && isLastSensorPressed)
             {
-                _state = State::Backward;
+                _state = MachineState::Backward;
             }
             else
             {
@@ -118,67 +122,67 @@ namespace Model::State
         }
     }
 
-    State StateMachine::GetState()
+    MachineState StateMachineDual::GetState() const
     {
         return _state;
     }
 
-    void StateMachine::Callback()
+    void StateMachineDual::Callback()
     {
         isFirstSensorPressed = digitalRead(PD2) == LOW;
         isLastSensorPressed = digitalRead(PD3) == LOW;
     }
 
-    void StateMachine::MotorForward()
+    void StateMachineDual::MotorForward() const
     {
         _motor->setSpeed(MAX_MOTOR_SPEED);
         _motor->forward();
     }
 
-    void StateMachine::MotorBackward()
+    void StateMachineDual::MotorBackward() const
     {
         _motor->setSpeed(MAX_MOTOR_SPEED);
         _motor->backward();
     }
 
-    void StateMachine::MotorStop()
+    void StateMachineDual::MotorStop() const
     {
         _motor->setSpeed(ZERO_MOTOR_SPEED);
         _motor->stop();
     }
 
-    void StateMachine::ResetTimer()
+    void StateMachineDual::ResetTimer() const
     {
         _stateStartTime = millis();
     }
 
-    bool StateMachine::IsWaitingAtStop()
+    bool StateMachineDual::IsWaitingAtStop() const
     {
         return millis() - _stateStartTime < STOP_TIME_MILLISECONDS;
     }
 
-    void StateMachine::LogInfo()
+    void StateMachineDual::LogInfo() const
     {
         if (DEBUG_MODE)
         {
             switch (_state)
             {
-            case State::Error:
+            case MachineState::Error:
                 Serial.println("Error");
                 break;
-            case State::Fordward:
+            case MachineState::Fordward:
                 Serial.println("Fordward");
                 break;
-            case State::Backward:
+            case MachineState::Backward:
                 Serial.println("Backward");
                 break;
-            case State::FirstStop:
+            case MachineState::FirstStop:
                 Serial.println("FirstStop");
                 break;
-            case State::LastStop:
+            case MachineState::LastStop:
                 Serial.println("LastStop");
                 break;
-            case State::Undefined:
+            case MachineState::Undefined:
                 Serial.println("Undefined");
                 break;
             default:

@@ -3,22 +3,20 @@
 #include <L298N.h>
 
 #include "./config.h"
-#include "./state/StateMachine.h"
+#include "./state/IStateMachine.h"
+#include "./state/single/StateMachineSingle.h"
+#include "./state/dual/StateMachineDual.h"
 #include "./mode/OperatingModeHandler.h"
 #include "./manual/ManualModeHandler.h"
 
 L298N *motor;
-Model::State::StateMachine *sm;
+Model::State::IStateMachine *sm;
 Model::Mode::OperatingModeHandler *omh;
 Model::Manual::ManualModeHandler *mmh;
 
 void setup()
 {
   Serial.begin(9600);
-
-  // Hall sensors
-  pinMode(HALL1, INPUT_PULLUP);
-  pinMode(HALL2, INPUT_PULLUP);
 
   // L298
   pinMode(EN, OUTPUT);
@@ -29,15 +27,18 @@ void setup()
   pinMode(POT, INPUT);
 
   // Hall sensor interruptions
-  attachInterrupt(digitalPinToInterrupt(HALL1), Model::State::StateMachine::Callback, CHANGE);
-  attachInterrupt(digitalPinToInterrupt(HALL2), Model::State::StateMachine::Callback, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(HALL1), Model::State::Dual::StateMachineDual::Callback, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(HALL2), Model::State::Dual::StateMachineDual::Callback, CHANGE);
 
   // Mode sensors
   pinMode(SWITCH, INPUT_PULLUP);
 
   motor = new L298N(EN, IN1, IN2);
-
-  sm = new Model::State::StateMachine();
+#if STOPS == 2
+  sm = new Model::State::Single::StateMachineSingle();
+#elif STOPS == 1
+  sm = new Model::State::Dual::StateMachineDual();
+#endif
   sm->Setup(motor);
 
   mmh = new Model::Manual::ManualModeHandler();

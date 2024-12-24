@@ -1,12 +1,12 @@
 #include "./OperatingModeHandler.h"
-#include "../state/StateMachine.h"
+#include "../state/IStateMachine.h"
 #include "../manual/ManualModeHandler.h"
 #include "../config.h"
 
 namespace Model::Mode
 {
     OperatingModeHandler::OperatingModeHandler(
-        State::StateMachine *stateMachine,
+        State::IStateMachine *stateMachine,
         Manual::ManualModeHandler *manualModeHandler)
     {
         _stateMachine = stateMachine;

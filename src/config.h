@@ -26,3 +26,6 @@
 // Motor speed limit
 #define MAX_MOTOR_SPEED 255
 #define ZERO_MOTOR_SPEED 0
+
+// Number of stops available in the system
+#define STOPS 2
