@@ -70,6 +70,18 @@ This repository contains the code and setup instructions for controlling an H0 s
   5. **Reverse:** The train moves backward between the Hall sensor positions.
 - **A timer** controls the restart timing at stop points.
 
+## Physical Connections
+
+- **Power Supply:**
+  - The Arduino Nano must be powered with a stable 5V supply.
+  - The L298N motor controller requires a 12V external power supply to drive the train motor. If more than 12V is supplied, the jumper on the converter that supplies 5V must be removed, otherwise the integrated circuit could be damaged.
+- **Ground (GND):**
+  - Ensure that the ground (GND) of the Arduino Nano and the 12V power supply are connected together to establish a common reference point.
+- **Motor Connections:**
+  - Connect the motor terminals to the output ports of the L298N module (OUT1 and OUT2).
+- **Control Signals:**
+  - Refer to the `config.h` file for the exact pin configuration of control signals, including PWM, direction, and sensor inputs.
+
 ## Configuration
 
 All pin definitions and adjustable parameters are located in the `config.h` file. Modify this file to:

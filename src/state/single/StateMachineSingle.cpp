@@ -1,5 +1,5 @@
 #include "./StateMachineSingle.h"
-#include "../States.h"
+#include "../State.h"
 #include "../../config.h"
 
 namespace Model::State::Single
@@ -8,7 +8,7 @@ namespace Model::State::Single
 
     StateMachineSingle::StateMachineSingle()
     {
-        _state = MachineState::Undefined;
+        _state = State::Undefined;
 
         pinMode(HALL1, INPUT_PULLUP);
 
@@ -28,18 +28,18 @@ namespace Model::State::Single
 
         switch (_state)
         {
-        case MachineState::Undefined:
+        case State::Undefined:
             if (isSensorPressed)
             {
-                _state = MachineState::Fordward;
+                _state = State::Fordward;
                 MotorForward();
             }
             break;
 
-        case MachineState::Fordward:
+        case State::Fordward:
             if (isSensorPressed)
             {
-                _state = MachineState::FirstStop;
+                _state = State::FirstStop;
                 MotorStop();
                 ResetTimer();
             }
@@ -49,10 +49,10 @@ namespace Model::State::Single
             }
             break;
 
-        case MachineState::FirstStop:
+        case State::FirstStop:
             if (!IsWaitingAtStop())
             {
-                _state = MachineState::Fordward;
+                _state = State::Fordward;
                 MotorForward();
             }
             break;

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <L298N.h>
-#include "../States.h"
+#include "../State.h"
 #include "../IStateMachine.h"
 
 namespace Model::State::Single

@@ -30,10 +30,10 @@ void setup()
   pinMode(SWITCH, INPUT_PULLUP);
 
   motor = new L298N(EN, IN1, IN2);
-#if STOPS == 2
+#if STOPS == 1
   sm = new Model::State::Single::StateMachineSingle();
 #endif
-#if STOPS == 1
+#if STOPS == 2
   sm = new Model::State::Dual::StateMachineDual();
 #endif
   sm->Setup(motor);

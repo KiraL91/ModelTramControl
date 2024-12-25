@@ -2,7 +2,7 @@
 
 namespace Model::State
 {
-    enum class MachineState
+    enum class State
     {
         Undefined,
         FirstStop,

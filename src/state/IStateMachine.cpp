@@ -2,7 +2,7 @@
 
 #include <L298N.h>
 
-#include "./States.h"
+#include "./State.h"
 #include "../config.h"
 
 namespace Model::State
@@ -12,7 +12,7 @@ namespace Model::State
         _motor = motor;
     }
 
-    MachineState IStateMachine::GetState()
+    State IStateMachine::GetState()
     {
         return _state;
     }
@@ -20,13 +20,13 @@ namespace Model::State
     void IStateMachine::Enable()
     {
         _enabled = true;
-        _state = MachineState::Undefined;
+        _state = State::Undefined;
     }
 
     void IStateMachine::Disable()
     {
         _enabled = false;
-        _state = MachineState::Undefined;
+        _state = State::Undefined;
     }
 
     void IStateMachine::MotorForward() const
@@ -63,22 +63,22 @@ namespace Model::State
         {
             switch (_state)
             {
-            case MachineState::Error:
+            case State::Error:
                 Serial.println("Error");
                 break;
-            case MachineState::Fordward:
+            case State::Fordward:
                 Serial.println("Fordward");
                 break;
-            case MachineState::Backward:
+            case State::Backward:
                 Serial.println("Backward");
                 break;
-            case MachineState::FirstStop:
+            case State::FirstStop:
                 Serial.println("FirstStop");
                 break;
-            case MachineState::LastStop:
+            case State::LastStop:
                 Serial.println("LastStop");
                 break;
-            case MachineState::Undefined:
+            case State::Undefined:
                 Serial.println("Undefined");
                 break;
             default:
