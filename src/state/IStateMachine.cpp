@@ -67,10 +67,12 @@ namespace Model::State
                 Serial.println("Error");
                 break;
             case State::Fordward:
-                Serial.println("Fordward");
+                Serial.print("Fordward. ");
+                LogMotorStatus();
                 break;
             case State::Backward:
-                Serial.println("Backward");
+                Serial.print("Backward");
+                LogMotorStatus();
                 break;
             case State::FirstStop:
                 Serial.println("FirstStop");
@@ -85,5 +87,13 @@ namespace Model::State
                 break;
             }
         }
+    }
+
+    void IStateMachine::LogMotorStatus() const
+    {
+        Serial.print("Speed: ");
+        Serial.print(_motor->getSpeed());
+        Serial.print(", Direction: ");
+        Serial.println(_motor->getDirection());
     }
 }

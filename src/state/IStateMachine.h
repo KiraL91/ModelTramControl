@@ -31,5 +31,8 @@ namespace Model::State
         void ResetTimer() const;
         bool IsWaitingAtStop() const;
         void LogInfo() const;
+
+    private:
+        void LogMotorStatus() const;
     };
 }
