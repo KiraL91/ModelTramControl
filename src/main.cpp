@@ -4,6 +4,7 @@
 
 #include "./config.h"
 #include "./state/IStateMachine.h"
+#include "./state/sensorless/StateMachineSensorless.h"
 #include "./state/single/StateMachineSingle.h"
 #include "./state/dual/StateMachineDual.h"
 #include "./mode/OperatingModeHandler.h"
@@ -30,6 +31,10 @@ void setup()
   pinMode(SWITCH, INPUT_PULLUP);
 
   motor = new L298N(EN, IN1, IN2);
+
+#if STOPS == 0
+  sm = new Model::State::Sensorless::StateMachineSensorless();
+#endif
 #if STOPS == 1
   sm = new Model::State::Single::StateMachineSingle();
 #endif
