@@ -64,28 +64,27 @@ namespace Model::State
             switch (_state)
             {
             case State::Error:
-                Serial.println("Error");
+                Serial.print("Error. ");
                 break;
             case State::Fordward:
                 Serial.print("Fordward. ");
-                LogMotorStatus();
                 break;
             case State::Backward:
-                Serial.print("Backward");
-                LogMotorStatus();
+                Serial.print("Backward. ");
                 break;
             case State::FirstStop:
-                Serial.println("FirstStop");
+                Serial.print("FirstStop. ");
                 break;
             case State::LastStop:
-                Serial.println("LastStop");
+                Serial.print("LastStop. ");
                 break;
             case State::Undefined:
-                Serial.println("Undefined");
+                Serial.print("Undefined. ");
                 break;
             default:
                 break;
             }
+            LogMotorStatus();
         }
     }
 
